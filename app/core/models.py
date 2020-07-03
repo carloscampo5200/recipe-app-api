@@ -1,10 +1,10 @@
 from django.db import models
 
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
-
-# Create your models here.
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, \
+	PermissionsMixin
 
 """ Create user manager class to create a user """
+
 
 class UserManager(BaseUserManager):
 
@@ -18,7 +18,6 @@ class UserManager(BaseUserManager):
 		user.save(using=self._db)
 
 		return user
-
 
 	def create_superuser(self, email, password):
 		""" Create and saves a new superuser """
@@ -38,5 +37,4 @@ class User(AbstractBaseUser, PermissionsMixin):
 	is_staff = models.BooleanField(default=False)
 
 	objects = UserManager()
-
 	USERNAME_FIELD = 'email'
