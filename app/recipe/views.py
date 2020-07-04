@@ -42,14 +42,36 @@ class IngredientViewSet(BaseRecipeAttrViewSet):
 
 class RecipeViewSet(viewsets.ModelViewSet):
 	"""Manage Recipes in the database"""
-	queryset = Recipe.objects.all()
 	serializer_class = serializers.RecipeSerializer
+	queryset = Recipe.objects.all()
 	authentication_classes = (TokenAuthentication,)
 	permission_classes = (IsAuthenticated,)
 
+	def _params_to_ints(self, qs):
+		"""Converts a list of string IDs to a list of integers"""
+		# our_string = '1,2,3'
+		# our_string_list = ['1','2','3']
+		# our_string_output = [1,2,3]
+		return [int(str_id) for str_id in qs.split(',')]
+
 	def get_queryset(self):
 		"""Retrieve the recipes for the authenticated user"""
-		return self.queryset.filter(user=self.request.user)
+		"""Gets the tags, ingredients for the filtering feature"""
+		tags = self.request.query_params.get('tags')
+		ingredients = self.request.query_params.get('ingredients')
+		"""Update the queryset"""
+		queryset = self.queryset
+		if tags:
+			""" Converts tags to individual id numbers """
+			tag_ids = self._params_to_ints(tags)
+			# tags__id__in Django convention to filter tags by id
+			queryset = queryset.filter(tags__id__in=tag_ids)
+		if ingredients:
+			# Converts ingredients to individual id
+			ingredient_ids = self._params_to_ints(ingredients)
+			queryset = queryset.filter(ingredients__id__in=ingredient_ids)
+
+		return queryset.filter(user=self.request.user)
 
 	def get_serializer_class(self):
 		"""Return appropiate serializer class / to set up the view"""
