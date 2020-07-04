@@ -6,6 +6,8 @@ from recipe import views
 
 router = DefaultRouter()
 router.register('tags', views.TagViewSet)
+router.register('ingredients', views.IngredientViewSet)
+
 """ So that the reverse function can see the appropiate app"""
 app_name = 'recipe'
 
